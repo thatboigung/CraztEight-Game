@@ -232,9 +232,9 @@ export const Blackjack: React.FC<BlackjackProps> = ({ onBack, playerCount }) => 
         </div>
 
         {/* Dealer Area */}
-        <div className="text-center w-full">
+        <div className="text-center w-full overflow-hidden">
           <div className="text-emerald-200/60 text-[10px] md:text-xs font-bold uppercase mb-2 md:mb-4 tracking-widest">Dealer Hand ({dealerScore})</div>
-          <div className="flex gap-2 md:gap-4 justify-center flex-wrap">
+          <div className="max-w-[100vw] w-full flex items-center justify-start md:justify-center overflow-x-auto custom-scrollbar gap-2 md:gap-4 px-4 pb-4 pt-2 snap-x">
             {dealerHand.map((card, i) => (
               <Card key={card.id} card={card} isFaceUp={i === 0 || (gameState !== 'PLAYING' && gameState !== 'AI_TURN')} isSmall={false} />
             ))}
@@ -272,8 +272,8 @@ export const Blackjack: React.FC<BlackjackProps> = ({ onBack, playerCount }) => 
         </AnimatePresence>
 
         {/* Player Area */}
-        <div className="text-center w-full">
-          <div className="flex gap-2 md:gap-4 justify-center mb-2 md:mb-4 flex-wrap">
+        <div className="text-center w-full overflow-hidden">
+          <div className="max-w-[100vw] w-full flex items-center justify-start md:justify-center overflow-x-auto custom-scrollbar gap-2 md:gap-4 px-4 mb-2 md:mb-4 pb-4 pt-2 snap-x">
             {playerHand.map((card) => (
               <Card key={card.id} card={card} isSmall={false} />
             ))}

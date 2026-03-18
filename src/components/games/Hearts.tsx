@@ -250,9 +250,9 @@ export const Hearts: React.FC<HeartsProps> = ({ onBack }) => {
            </div>
         </div>
 
-        <div className="col-start-1 col-span-3 row-start-3 flex flex-col items-center justify-end pb-4">
+        <div className="col-start-1 col-span-3 row-start-3 flex flex-col items-center justify-end pb-4 w-full overflow-hidden">
           <div className="text-[8px] md:text-xs font-bold text-emerald-200/40 mb-1 md:mb-2">Your Hand ({scores[0]})</div>
-          <div className="flex flex-wrap justify-center gap-1 md:-space-x-6 md:hover:-space-x-2 transition-all duration-300 max-w-full">
+          <div className="max-w-[100vw] w-full flex items-center justify-start md:justify-center overflow-x-auto custom-scrollbar gap-1 md:-space-x-6 md:hover:-space-x-2 px-4 transition-all duration-300 pb-6 pt-4 snap-x">
             {hands[0].map((card) => (
               <Card 
                 key={card.id} 
