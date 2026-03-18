@@ -12,6 +12,13 @@ interface CrazyEightsProps {
   playerCount: number;
 }
 
+interface LogEntry {
+  id: string;
+  message: string;
+  type: 'info' | 'action' | 'penalty' | 'success';
+  timestamp: number;
+}
+
 const RESTRICTED_WINNING_RANKS = [
   Rank.ACE, Rank.TWO, Rank.JOKER, Rank.SEVEN, Rank.KING, Rank.EIGHT, Rank.JACK
 ];
@@ -110,6 +117,21 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
   const [aiPlayerNames, setAiPlayerNames] = useState<string[]>([]);
   const [aiShouts, setAiShouts] = useState<Record<number, string | null>>({});
   const [sessionWins, setSessionWins] = useState<Record<number, number>>({});
+  const [showDiscardSpread, setShowDiscardSpread] = useState(false);
+  const [winExpandedPlayer, setWinExpandedPlayer] = useState<number | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  const addLog = (message: string, type: LogEntry['type'] = 'info') => {
+    setLogs(prev => [
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        message,
+        type,
+        timestamp: Date.now()
+      },
+      ...prev
+    ].slice(0, 50));
+  };
 
   const triggerAiShout = (playerIndex: number, category: keyof typeof aiPhrases) => {
     const shout = getAiShout(category);
@@ -153,7 +175,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
         const selectedNames = shuffled.slice(0, Math.max(0, playerCount - 1));
         setAiPlayerNames(selectedNames);
       }
-      
+
       // Trigger intro shouts for all AI
       setTimeout(() => {
         players.forEach(pIdx => {
@@ -199,7 +221,9 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
     setHasDrawn(false);
     setIsEightBlocked(false);
     setIsPaused(false);
-    setMessage(players.length < playerCount ? `Round ${playerCount - players.length + 1} Started!` : 'Game Started! Match rank or suit.');
+    const msg = players.length < playerCount ? `Round ${playerCount - players.length + 1} Started!` : 'Game Started!';
+    setMessage(msg);
+    addLog(msg, 'info');
   };
 
   useEffect(() => {
@@ -221,16 +245,16 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
       return false;
     }
 
-    // Joker on deck: any card is valid
-    if (topCard.rank === Rank.JOKER) return true;
-
-    // Ace of Spades on deck: any card is valid
-    if (topCard.rank === Rank.ACE && topCard.suit === Suit.SPADES) return true;
-
-    // Penalty phase
+    // Penalty phase — MUST check before any "wild" shortcuts.
+    // During a penalty (from a 2, Joker, or stacked penalties), only 2, Joker, or Ace can be played.
     if (penaltyCount > 0) {
-      // Can only play 2, Joker, or Ace
       return card.rank === Rank.TWO || card.rank === Rank.JOKER || card.rank === Rank.ACE;
+    }
+
+    // Non-penalty phase wildcard logic
+    // If Joker or Ace of Spades is on deck and no penalty is active, any card is valid.
+    if (penaltyCount === 0 && (topCard.rank === Rank.JOKER || (topCard.rank === Rank.ACE && topCard.suit === Suit.SPADES))) {
+      return true;
     }
 
     // Normal phase
@@ -286,6 +310,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
     setDiscardPile([...discardPile, card]);
     setHasDrawn(false);
     setIsSkipPending(false); // Reset skip pending when a card is played (either a counter 7 or a new card)
+    addLog(`${isPlayer ? 'You' : getOpponentName(playerIndex)} played ${card.rank} of ${card.suit}`, 'action');
 
     // Handle Penalties
     let newPenalty = penaltyCount;
@@ -339,7 +364,9 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
             suits.filter(v => v === a).length - suits.filter(v => v === b).length
           ).pop() || Suit.SPADES;
           setActiveSuit(mostCommon);
-          setMessage(`${getOpponentName(playerIndex)} demanded ` + mostCommon);
+          const dMsg = `${getOpponentName(playerIndex)} demanded ` + mostCommon;
+          setMessage(dMsg);
+          addLog(dMsg, 'info');
           nextTurn();
         }
       }
@@ -394,9 +421,13 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
     }
 
     if (newPenalty > penaltyCount) {
-      setMessage(`${isPlayer ? 'Player' : getOpponentName(playerIndex)} played a penalty card! +${newPenalty - penaltyCount} to draw.`);
+      const pMsg = `${isPlayer ? 'Player' : getOpponentName(playerIndex)} played a penalty card! +${newPenalty - penaltyCount} to draw.`;
+      setMessage(pMsg);
+      addLog(pMsg, 'penalty');
     } else if (newPenalty === 0 && penaltyCount > 0) {
-      setMessage(`${isPlayer ? 'Player' : getOpponentName(playerIndex)} blocked the penalty with an Ace!`);
+      const bMsg = `${isPlayer ? 'Player' : getOpponentName(playerIndex)} blocked the penalty with an Ace!`;
+      setMessage(bMsg);
+      addLog(bMsg, 'success');
     }
   };
 
@@ -481,9 +512,11 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
 
     setExpandedPlayer(null); // Reset when setting new results
     setRoundResults(finalResults);
+    addLog(`${roundWinnerIndex === 0 ? 'You' : getOpponentName(roundWinnerIndex)} won the round!`, 'success');
 
     if (eliminatedIndex === 0) {
       setWinner('Defeat');
+      addLog('Game Over: You were eliminated.', 'penalty');
       recordGameResult(GameMode.CRAZY_EIGHTS, false);
       const tournamentWinnerIdx = activePlayers.filter(idx => idx !== eliminatedIndex)[0];
       if (tournamentWinnerIdx !== undefined) {
@@ -538,12 +571,15 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
       if (penaltyCount === 0) {
         setHasDrawn(true);
         if (drawn.length > 0) {
-          setMessage(reshuffled ? '♻️ Deck reshuffled from discard! Card drawn.' : 'Choose to play the drawn card or continue drawing/pass.');
+          const dMsg = reshuffled ? '♻️ Deck reshuffled! Card drawn.' : 'Card drawn.';
+          setMessage(dMsg);
+          addLog(`You drew a card`, 'info');
         } else {
           setMessage('No cards left anywhere! You must pass.');
         }
       } else {
         setPenaltyCount(0);
+        addLog(`You drew ${penaltyCount} penalty cards`, 'penalty');
         nextTurn();
       }
     } else {
@@ -553,8 +589,10 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
 
       if (penaltyCount === 0) {
         setHasDrawn(true);
+        addLog(`${getOpponentName(playerIndex)} drew a card`, 'info');
       } else {
         setPenaltyCount(0);
+        addLog(`${getOpponentName(playerIndex)} drew ${penaltyCount} penalty cards`, 'penalty');
         nextTurn();
       }
     }
@@ -564,9 +602,13 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
     setHasDrawn(false);
     if (isSkipPending) {
       setIsSkipPending(false);
-      setMessage(turn === 0 ? "You were skipped!" : `${getOpponentName(turn)} was skipped.`);
+      const sMsg = turn === 0 ? "You were skipped!" : `${getOpponentName(turn)} was skipped.`;
+      setMessage(sMsg);
+      addLog(sMsg, 'penalty');
     } else {
-      setMessage(turn === 0 ? "Player passed." : `${getOpponentName(turn)} passed.`);
+      const pMsg = turn === 0 ? "Player passed." : `${getOpponentName(turn)} passed.`;
+      setMessage(pMsg);
+      addLog(pMsg, 'info');
     }
     nextTurn();
   };
@@ -671,6 +713,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
   const handleSuitPick = (suit: Suit) => {
     setActiveSuit(suit);
     setShowSuitPicker(false);
+    addLog(`You demanded ${suit}`, 'info');
     nextTurn();
   };
 
@@ -785,6 +828,39 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
           </div>
         </div>
 
+        {/* Game History Log */}
+        <div className="absolute top-[280px] left-0 md:top-[380px] md:left-0 flex flex-col gap-2 z-10 scale-75 sm:scale-100 origin-top-left w-[180px] pointer-events-none">
+          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex flex-col h-[200px] pointer-events-auto">
+            <div className="flex items-center gap-2 mb-2 border-b border-white/5 pb-2">
+              <Users className="w-3 h-3 text-emerald-400" />
+              <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Game Log</span>
+            </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-1">
+              <AnimatePresence initial={false}>
+                {logs.map((log) => (
+                  <motion.div
+                    key={log.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className={`text-[9px] leading-tight flex items-start gap-1.5 p-1.5 rounded-lg border ${log.type === 'action' ? 'text-white border-white/5' :
+                      log.type === 'penalty' ? 'text-red-400 border-red-500/20 bg-red-500/5' :
+                        log.type === 'success' ? 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5' :
+                          'text-white/60 border-transparent'
+                      }`}
+                  >
+                    <div className={`w-1 h-1 rounded-full mt-1.5 shrink-0 ${log.type === 'action' ? 'bg-white' :
+                      log.type === 'penalty' ? 'bg-red-500' :
+                        log.type === 'success' ? 'bg-emerald-500' :
+                          'bg-white/40'
+                      }`} />
+                    <span>{log.message}</span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
         {/* AI Hands - Top Center/Right */}
         <div className="absolute top-0 right-0 md:right-0 flex flex-row flex-wrap justify-end md:flex-col items-start md:items-end gap-2 md:gap-6 pr-2 md:pr-4 scale-75 sm:scale-100 origin-top-right z-0 max-w-[70%] md:max-w-none">
           {aiHands.map((hand, idx) => {
@@ -886,8 +962,12 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                     initial={{ scale: 2, rotate: 90, opacity: 0 }}
                     animate={{ scale: 1, rotate: 0, opacity: 1 }}
                     transition={{ type: 'spring', damping: 12 }}
+                    onClick={() => discardPile.length > 0 && setShowDiscardSpread(true)}
+                    className="cursor-pointer"
+                    title="Tap to see last played cards"
                   >
                     <Card card={topCard} isSmall={window.innerWidth < 640} />
+                    <div className="text-[6px] md:text-[8px] font-black uppercase tracking-widest text-emerald-500/40 mt-1 animate-pulse">tap to inspect</div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1042,7 +1122,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                           )}
                         </div>
                       </div>
-                      
+
                       <AnimatePresence>
                         {expandedPlayer === res.playerIndex && (
                           <motion.div
@@ -1107,74 +1187,106 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-500 to-blue-500" />
 
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 -mr-1">
-              <motion.div
-                initial={{ rotate: -10, scale: 0 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: 'spring', damping: 12 }}
-                className="w-14 h-14 md:w-24 md:h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-emerald-500/40 mt-2"
-              >
-                <RotateCcw className="w-7 h-7 md:w-12 md:h-12 text-emerald-950" />
-              </motion.div>
+                <motion.div
+                  initial={{ rotate: -10, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ type: 'spring', damping: 12 }}
+                  className="w-14 h-14 md:w-24 md:h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-emerald-500/40 mt-2"
+                >
+                  <RotateCcw className="w-7 h-7 md:w-12 md:h-12 text-emerald-950" />
+                </motion.div>
 
-              <h2 className="text-4xl md:text-8xl font-black mb-2 md:mb-4 text-white tracking-tighter italic leading-none">
-                {winner === 'Tournament Victory' ? 'VICTORY' : 'DEFEAT'}
-              </h2>
+                <h2 className="text-4xl md:text-8xl font-black mb-2 md:mb-4 text-white tracking-tighter italic leading-none">
+                  {winner === 'Tournament Victory' ? 'VICTORY' : 'DEFEAT'}
+                </h2>
 
-              <p className="text-emerald-400 font-black uppercase tracking-[0.3em] mb-4 md:mb-6 text-xs md:text-base">
-                {winner === 'Tournament Victory' ? 'The table is yours' : 'You were eliminated'}
-              </p>
+                <p className="text-emerald-400 font-black uppercase tracking-[0.3em] mb-4 md:mb-6 text-xs md:text-base">
+                  {winner === 'Tournament Victory' ? 'The table is yours' : 'You were eliminated'}
+                </p>
 
-              {/* Session Leaderboard */}
-              <div className="bg-white/5 rounded-2xl md:rounded-3xl p-3 md:p-5 mb-3 md:mb-6 border border-white/10 max-w-md mx-auto relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-2 opacity-10">
-                  <Trophy className="w-20 h-20 text-white" />
-                </div>
-                <div className="flex items-center justify-center gap-2 mb-4 relative z-10">
-                  <Trophy className="w-4 h-4 text-emerald-500" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Session Leaderboard</span>
-                </div>
-                <div className="space-y-2 relative z-10">
-                  {Object.entries(sessionWins)
-                    .sort((a, b) => (b[1] as number) - (a[1] as number))
-                    .map(([idx, wins], pos) => (
-                      <div key={idx} className="flex justify-between items-center px-4 py-3 bg-black/20 rounded-xl border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-xs font-black ${pos === 0 ? 'text-yellow-500' : 'text-white/40'}`}>#{pos + 1}</span>
-                          <span className="font-bold text-white">{parseInt(idx) === 0 ? 'You' : getOpponentName(parseInt(idx))}</span>
+                {/* Session Leaderboard */}
+                <div className="bg-white/5 rounded-2xl md:rounded-3xl p-3 md:p-5 mb-3 md:mb-6 border border-white/10 max-w-md mx-auto relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-2 opacity-10">
+                    <Trophy className="w-20 h-20 text-white" />
+                  </div>
+                  <div className="flex items-center justify-center gap-2 mb-4 relative z-10">
+                    <Trophy className="w-4 h-4 text-emerald-500" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Session Leaderboard</span>
+                  </div>
+                  <div className="space-y-2 relative z-10">
+                    {Object.entries(sessionWins)
+                      .sort((a, b) => (b[1] as number) - (a[1] as number))
+                      .map(([idx, wins], pos) => (
+                        <div key={idx} className="flex justify-between items-center px-4 py-3 bg-black/20 rounded-xl border border-white/5">
+                          <div className="flex items-center gap-3">
+                            <span className={`text-xs font-black ${pos === 0 ? 'text-yellow-500' : 'text-white/40'}`}>#{pos + 1}</span>
+                            <span className="font-bold text-white">{parseInt(idx) === 0 ? 'You' : getOpponentName(parseInt(idx))}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-black text-white">{wins}</span>
+                            <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Wins</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl font-black text-white">{wins}</span>
-                          <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">Wins</span>
+                      ))}
+                  </div>
+                </div>
+
+                {roundResults && (
+                  <div className="space-y-1 md:space-y-3 mb-3 md:mb-6 text-left max-w-md mx-auto">
+                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4 text-center">Standings This Round</div>
+                    {roundResults.map((res) => (
+                      <div key={res.playerIndex} className="flex flex-col gap-2">
+                        <div
+                          onClick={() => setWinExpandedPlayer(winExpandedPlayer === res.playerIndex ? null : res.playerIndex)}
+                          className={`flex justify-between items-center p-3 md:p-4 rounded-2xl border transition-all cursor-pointer hover:bg-white/10 ${res.eliminated ? 'bg-red-500/10 border-red-500/50' : 'bg-white/5 border-white/10'}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${res.eliminated ? 'bg-red-500' : 'bg-emerald-500'}`} />
+                            <span className="text-sm md:text-lg font-bold text-white">
+                              {res.playerIndex === 0 ? 'You' : getOpponentName(res.playerIndex)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 md:gap-4">
+                            <span className="text-xl md:text-2xl font-black text-white">{res.points} pts</span>
+                            {res.eliminated && (
+                              <span className="bg-red-500 text-white text-[8px] md:text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">Eliminated</span>
+                            )}
+                            <span className="text-white/30 text-xs">{winExpandedPlayer === res.playerIndex ? '▲' : '▼'}</span>
+                          </div>
                         </div>
+                        <AnimatePresence>
+                          {winExpandedPlayer === res.playerIndex && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="bg-black/20 rounded-xl md:rounded-2xl overflow-hidden border border-white/5"
+                            >
+                              <div className="p-3 md:p-4">
+                                <div className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/60 mb-2 md:mb-3">
+                                  Cards Remaining ({res.hand?.length || 0})
+                                </div>
+                                <div className="flex flex-wrap gap-[-8px] md:gap-[-12px] min-h-[50px] md:min-h-[80px]">
+                                  {res.hand && res.hand.length > 0 ? (
+                                    res.hand.map((card, idx) => (
+                                      <div key={card.id} className="relative transition-transform hover:z-10 hover:-translate-y-2 hover:scale-110" style={{ zIndex: idx, marginLeft: idx > 0 ? '-1rem' : '0' }}>
+                                        <div className="scale-75 origin-top-left md:scale-90">
+                                          <Card card={card} isSmall isFaceUp />
+                                        </div>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <span className="text-white/40 text-xs md:text-sm font-bold italic w-full text-center py-2">No cards left</span>
+                                  )}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ))}
-                </div>
-              </div>
-
-              {roundResults && (
-                <div className="space-y-1 md:space-y-3 mb-3 md:mb-6 text-left max-w-md mx-auto">
-                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-4 text-center">Standings This Round</div>
-                  {roundResults.map((res) => (
-                    <div
-                      key={res.playerIndex}
-                      className={`flex justify-between items-center p-3 md:p-4 rounded-2xl border transition-all ${res.eliminated ? 'bg-red-500/10 border-red-500/50' : 'bg-white/5 border-white/10'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${res.eliminated ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                        <span className="text-sm md:text-lg font-bold text-white">
-                          {res.playerIndex === 0 ? 'You' : getOpponentName(res.playerIndex)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-xl md:text-2xl font-black text-white">{res.points} pts</span>
-                        {res.eliminated && (
-                          <span className="bg-red-500 text-white text-[8px] md:text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">Eliminated</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                )}
               </div>{/* end scroll area */}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 shrink-0 pt-3 border-t border-white/5">
@@ -1193,6 +1305,59 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                   QUIT
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Discard Spread Overlay */}
+      <AnimatePresence>
+        {showDiscardSpread && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDiscardSpread(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-[120] p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.8, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 30 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative flex flex-col items-center gap-6"
+            >
+              <div className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-emerald-400">Last Played Cards</div>
+              <div className="relative flex items-center justify-center" style={{ height: '200px', width: '340px' }}>
+                {discardPile.slice(-5).map((card, idx, arr) => {
+                  const total = arr.length;
+                  const center = (total - 1) / 2;
+                  const offset = idx - center;
+                  const rotate = offset * 18;
+                  const x = offset * 60;
+                  const y = Math.abs(offset) * 8;
+                  return (
+                    <motion.div
+                      key={card.id}
+                      initial={{ x: 0, y: 0, rotate: 0, opacity: 0, scale: 0.5 }}
+                      animate={{ x, y, rotate, opacity: 1, scale: 1 }}
+                      transition={{ type: 'spring', damping: 14, delay: idx * 0.07 }}
+                      className="absolute"
+                      style={{ zIndex: idx }}
+                    >
+                      <Card card={card} isSmall={window.innerWidth < 640} isFaceUp />
+                    </motion.div>
+                  );
+                })}
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowDiscardSpread(false)}
+                className="mt-2 bg-white/10 hover:bg-white/20 border border-white/10 text-white font-black text-xs uppercase tracking-widest px-8 py-3 rounded-2xl transition-all"
+              >
+                Close
+              </motion.button>
             </motion.div>
           </motion.div>
         )}
