@@ -234,8 +234,8 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
         </div>
 
         {/* Player Area */}
-        <div className="flex flex-col items-center pb-4 md:pb-8 w-full overflow-hidden">
-          <div className="max-w-[100vw] w-full flex items-center justify-start md:justify-center overflow-x-auto custom-scrollbar gap-1 md:gap-2 mb-2 px-4 pb-4 pt-2 snap-x">
+        <div className="flex flex-col items-center pb-4 md:pb-8">
+          <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-2">
             {playerHand.map((card) => (
               <div key={card.id} className="flex flex-col gap-1">
                 <Card 

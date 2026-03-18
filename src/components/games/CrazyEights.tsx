@@ -1095,7 +1095,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
           </div>
 
           <div className="flex flex-col items-center gap-2 w-full max-w-6xl relative">
-            <div className="max-w-[100vw] w-full flex items-center justify-start md:justify-center overflow-x-auto custom-scrollbar gap-2 md:gap-3 px-4 relative min-h-[180px] pb-6 pt-4 snap-x">
+            <div className="w-full flex justify-center items-center flex-wrap gap-2 md:gap-3 px-2 md:px-4 relative min-h-[160px]">
               <AnimatePresence>
                 {playerHand.map((card, index) => {
                   const isValid = turn === 0 && checkValidMove(card, playerHand.length);
