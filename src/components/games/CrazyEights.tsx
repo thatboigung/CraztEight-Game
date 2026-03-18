@@ -31,22 +31,32 @@ const aiNames = [
   // --- Shona Names ---
   "Kudzai", "Tadiwa", "Farai", "Nyasha", "Tendai", "Ruvimbo", "Chipo", "Tatenda", "Mufaro", "Rufaro",
   "Tinashe", "Kumbirayi", "Anesu", "Sekai", "Tafadzwa", "Munashe", "Panashe", "Tapiwa", "Vimbai", "Isheanesu",
-  "Tanyaradzwa", "Rumbidzai", "Takunda", "Chengetai", "Mazvita",
+  "Tanyaradzwa", "Rumbidzai", "Takunda", "Chengetai", "Mazvita", "Tariro", "Munya", "Nyeredzi", "Garikai", "Ruvarashe",
+  "Farayi", "Shingai", "Simbarashe", "Tawananyasha", "Netsai", "Fadzai", "Zvikomborero", "Tariromunashe", "Makanaka", "Rudo",
 
   // --- Ndebele Names ---
   "Thandeka", "Sibusiso", "Bhekuzulu", "Nqobile", "Lindiwe", "Mthokozisi", "Gugu", "Senzangakhona", "Thulani", "Nomusa",
   "Dumiso", "Jabulani", "Khanyisile", "Mandla", "Nomalanga", "Sihle", "Thabani", "Vusumuzi", "Zanele", "Zenzo",
-  "Ayanda", "Busisiwe", "Mlungisi", "Njabulo", "Sibonokuhle",
+  "Ayanda", "Busisiwe", "Mlungisi", "Njabulo", "Sibonokuhle", "Sibongile", "Nhlalo", "Thandazile", "Qondile", "Bhekinkosi",
+  "Nonjabulo", "Mthandazo", "Sindisiwe", "Thabitha", "Dumisile", "Phakamile", "Nokuthaba", "Siphilisa", "Thembekile", "Nompilo",
 
   // --- Zulu Names ---
   "Sipho", "Lungelo", "Mbali", "Nandi", "Zodwa", "Bheki", "Thembi", "Bandile", "Simphiwe", "Nokuthula",
   "Melusi", "Lwandle", "Sfiso", "Zanele", "Thabo", "Hlengiwe", "Siyabonga", "Dumisani", "Zonke", "Khaya",
-  "Nonhlanhla", "Sizwe", "Mpendulo", "Khethiwe", "Bongani",
+  "Nonhlanhla", "Sizwe", "Mpendulo", "Khethiwe", "Bongani", "Lethabo", "Nkosana", "Thandolwethu", "Minhle", "Zinhle",
+  "Sakhile", "Bawinile", "Nqaba", "Snethemba", "Mjabulelwa", "Nokwanda", "Sphesihle", "Zanelle", "Mpumi", "Thabisa",
 
   // --- English Names ---
   "James", "Sarah", "Victor", "Blessing", "Prudence", "Prince", "Grace", "Prosper", "Hope", "Joy",
-  "Precious", "Tinashe", "Gift", "Lovemore", "Patience", "Faith", "Bright", "Wisdom", "Fortune", "Charity",
-  "Justice", "Liberty", "Mercy", "Praise", "Simba"
+  "Precious", "Gift", "Lovemore", "Patience", "Faith", "Bright", "Wisdom", "Fortune", "Charity",
+  "Justice", "Liberty", "Mercy", "Praise", "Simba", "Oliver", "Amelia", "William", "Sophia", "Jacob",
+  "Isabella", "Ethan", "Mia", "Alexander", "Charlotte", "Michael", "Harper", "Daniel", "Evelyn", "Matthew",
+
+  // --- Spanish Names ---
+  "Mateo", "Valentina", "Santiago", "Camila", "Matías", "Valeria", "Sebastián", "Isabella", "Leonardo", "Ximena",
+  "Diego", "Daniela", "Thiago", "Sofia", "Emiliano", "María", "Julián", "Lucía", "Nicolás", "Victoria",
+  "Lucas", "Martina", "Alejandro", "Luciana", "Benjamín", "Valeria", "Samuel", "Samantha", "Joaquín", "Gabriela",
+  "Gabriel", "Mariana", "Tomás", "Antonella", "José", "Renata", "Miguel", "Emma", "David", "Catalina"
 ];
 
 const aiPhrases = {
@@ -58,7 +68,17 @@ const aiPhrases = {
     "Don't look at me like that, it's just business.",
     "Ouch. That's going to hurt your hand.",
     "Stacking is a beautiful thing, isn't it?",
-    "Is your hand getting heavy yet?"
+    "Is your hand getting heavy yet?",
+    "Here, hold these for me.",
+    "A present, just for you. Open it!",
+    "Whoops, my hand slipped...",
+    "I could have played nice, but where is the fun in that?",
+    "Another one bites the dust. Draw up!",
+    "It's raining cards! Hallelujah!",
+    "You were doing so well, too. What a shame.",
+    "I'll take 'Drawing Cards' for 500.",
+    "Don't worry, they're lightweight.",
+    "Think of it as expanding your options."
   ],
   // When the AI is winning or just played a good move
   winning: [
@@ -67,7 +87,17 @@ const aiPhrases = {
     "Checkmate... wait, wrong game. But I'm winning!",
     "I could do this in my sleep.",
     "You're making this too easy for me.",
-    "Are you even trying to win?"
+    "Are you even trying to win?",
+    "Read 'em and weep.",
+    "Victory is in the air. Can you smell it?",
+    "I almost feel bad for you. Almost.",
+    "Class is in session. Take notes.",
+    "Just call me the card whisperer.",
+    "Did you really think that would work?",
+    "My grandmother plays better than that.",
+    "I'm not even using my full processing power.",
+    "It's like playing against a child.",
+    "I'll be done here in a minute."
   ],
   // When you play a Power Card on the AI
   salty: [
@@ -76,14 +106,34 @@ const aiPhrases = {
     "You're lucky I don't have an Ace right now.",
     "Oh, so we're playing like THAT now?",
     "I'll remember this when it's my turn.",
-    "Fine. I needed more cards anyway..."
+    "Fine. I needed more cards anyway...",
+    "Was that really necessary?",
+    "You've just made a very powerful enemy.",
+    "I hope you step on a Lego for that.",
+    "My revenge will be swift and terrible.",
+    "I was just about to win! Inconceivable!",
+    "Are we doing this? Okay, gloves are off.",
+    "I didn't want to win this round anyway.",
+    "That's just petty. I respect it, but petty.",
+    "I call foul! Ref! Where is the ref?",
+    "You're going to pay for that one."
   ],
   // General Game Start
   intro: [
     "Good luck, you're going to need it.",
     "Let's see if you can handle my strategy.",
     "Prepare to be defeated!",
-    "Ready to lose some digital coins?"
+    "Ready to lose some digital coins?",
+    "I’ve calculated a 99% chance of your defeat.",
+    "May the best algorithm win.",
+    "It's time to duel! ...I mean, play cards.",
+    "Don't cry when I take all your points.",
+    "I hope you brought your A-game.",
+    "Let the best hand win. (Spoiler: It's mine).",
+    "I'm programmed to be ruthless today.",
+    "Another game, another inevitable victory.",
+    "I've analyzed your play style. It's... lacking.",
+    "Let's make this quick, I have computations to run."
   ]
 };
 
@@ -120,6 +170,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
   const [showDiscardSpread, setShowDiscardSpread] = useState(false);
   const [winExpandedPlayer, setWinExpandedPlayer] = useState<number | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [showMobileLogs, setShowMobileLogs] = useState(false);
 
   const addLog = (message: string, type: LogEntry['type'] = 'info') => {
     setLogs(prev => [
@@ -829,13 +880,16 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
         </div>
 
         {/* Game History Log */}
-        <div className="absolute top-[280px] left-0 md:top-[380px] md:left-0 flex flex-col gap-2 z-10 scale-75 sm:scale-100 origin-top-left w-[180px] pointer-events-none">
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex flex-col h-[200px] pointer-events-auto">
-            <div className="flex items-center gap-2 mb-2 border-b border-white/5 pb-2">
-              <Users className="w-3 h-3 text-emerald-400" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/60">Game Log</span>
+        <div className="absolute top-[280px] left-0 md:top-[380px] md:left-0 flex flex-col gap-2 z-30 scale-75 sm:scale-100 origin-top-left pointer-events-none">
+          <div className={`bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex flex-col pointer-events-auto transition-all ${showMobileLogs ? 'h-[200px] w-[180px]' : 'h-auto w-auto md:h-[200px] md:w-[180px]'}`}>
+            <div 
+              className={`flex items-center gap-2 cursor-pointer md:cursor-default transition-all ${showMobileLogs ? 'mb-2 border-b border-white/5 pb-2' : 'md:mb-2 md:border-b md:border-white/5 md:pb-2'}`}
+              onClick={() => window.innerWidth < 768 && setShowMobileLogs(!showMobileLogs)}
+            >
+              <Users className="w-3 h-3 md:w-3 md:h-3 text-emerald-400" />
+              <span className={`text-[9px] font-black uppercase tracking-widest text-white/60 ${!showMobileLogs ? 'hidden md:block' : ''}`}>Game Log</span>
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-1">
+            <div className={`flex-1 overflow-y-auto custom-scrollbar flex-col gap-2 pr-1 ${!showMobileLogs ? 'hidden md:flex' : 'flex'}`}>
               <AnimatePresence initial={false}>
                 {logs.map((log) => (
                   <motion.div
@@ -862,7 +916,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
         </div>
 
         {/* AI Hands - Top Center/Right */}
-        <div className="absolute top-0 right-0 md:right-0 flex flex-row flex-wrap justify-end md:flex-col items-start md:items-end gap-2 md:gap-6 pr-2 md:pr-4 scale-75 sm:scale-100 origin-top-right z-0 max-w-[70%] md:max-w-none">
+        <div className="absolute top-0 right-0 md:right-0 flex flex-col items-end gap-2 md:gap-6 pr-2 md:pr-4 scale-75 sm:scale-100 origin-top-right z-0 max-w-[70%] md:max-w-none">
           {aiHands.map((hand, idx) => {
             const aiIdx = idx + 1;
             if (!activePlayers.includes(aiIdx)) return null;
@@ -920,7 +974,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                 initial={{ opacity: 0, scale: 0.8, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                className="absolute -top-12 md:-top-20 bg-white text-black px-4 py-2 md:px-8 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] z-20 flex items-center gap-2 md:gap-3 whitespace-nowrap"
+                className="absolute -bottom-16 md:-bottom-13 bg-white text-black px-4 py-2 md:px-8 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-[0_0_40px_rgba(255,255,255,0.2)] z-30 flex items-center gap-2 md:gap-3 whitespace-nowrap"
               >
                 <AlertCircle className="w-3 h-3 md:w-4 h-4" /> {message}
               </motion.div>
@@ -955,22 +1009,28 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
 
             <div className="text-center relative">
               <div className="text-[7px] md:text-[10px] uppercase font-black tracking-[0.2em] text-emerald-500/40 mb-1 md:mb-4">Discard</div>
-              <AnimatePresence mode="popLayout">
-                {topCard && (
-                  <motion.div
-                    key={topCard.id}
-                    initial={{ scale: 2, rotate: 90, opacity: 0 }}
-                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                    transition={{ type: 'spring', damping: 12 }}
-                    onClick={() => discardPile.length > 0 && setShowDiscardSpread(true)}
-                    className="cursor-pointer"
-                    title="Tap to see last played cards"
-                  >
-                    <Card card={topCard} isSmall={window.innerWidth < 640} />
-                    <div className="text-[6px] md:text-[8px] font-black uppercase tracking-widest text-emerald-500/40 mt-1 animate-pulse">tap to inspect</div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div className="relative w-[60px] h-[84px] sm:w-[80px] sm:h-[112px] md:w-[120px] md:h-[168px]" onClick={() => discardPile.length > 0 && setShowDiscardSpread(true)} title="Tap to see last played cards">
+                {discardPile.slice(-4).map((card, idx, arr) => {
+                  const absIdx = discardPile.length - arr.length + idx;
+                  const rotate = (absIdx * 17) % 30 - 15;
+                  const xOffset = (absIdx * 7) % 10 - 5;
+                  const yOffset = (absIdx * 5) % 10 - 5;
+                  const isTop = idx === arr.length - 1;
+
+                  return (
+                    <motion.div
+                      key={card.id}
+                      initial={isTop ? { scale: 2, rotate: rotate + 90, opacity: 0 } : false}
+                      animate={{ scale: 1, rotate: rotate, opacity: 1, x: xOffset, y: yOffset }}
+                      transition={{ type: 'spring', damping: 12 }}
+                      className="absolute top-0 left-0 cursor-pointer"
+                    >
+                      <Card card={card} isSmall={window.innerWidth < 640} />
+                    </motion.div>
+                  );
+                })}
+                <div className="absolute -bottom-6 w-full text-center text-[6px] md:text-[8px] font-black uppercase tracking-widest text-emerald-500/40 mt-1 animate-pulse">tap to inspect</div>
+              </div>
               {topCard?.rank === Rank.EIGHT && (
                 <div className="absolute -bottom-4 -right-4 md:-bottom-2 md:-right-10 w-8 h-8 md:w-8 md:h-8 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl z-20">
                   <span className="text-lg md:text-2xl">
@@ -1295,7 +1355,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                   className="group relative overflow-hidden bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-4 md:py-5 rounded-2xl md:rounded-3xl text-lg md:text-xl transition-all shadow-xl flex items-center justify-center gap-2 md:gap-3"
                 >
                   <RotateCcw className="w-6 h-6 group-hover:rotate-180 transition-transform duration-500" />
-                  PLAY AGAIN
+                  Start next Tournament
                 </button>
                 <button
                   onClick={onBack}
