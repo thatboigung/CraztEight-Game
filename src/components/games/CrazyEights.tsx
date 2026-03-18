@@ -992,7 +992,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                 <Card
                   onClick={() => turn === 0 && drawCards(0)}
                   isFaceUp={false}
-                  isSmall={window.innerWidth < 640}
+                  isSmall={false}
                   className={turn === 0 ? 'shadow-[0_0_20px_rgba(16,185,129,0.3)]' : ''}
                 />
                 {penaltyCount > 0 && (
@@ -1009,7 +1009,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
 
             <div className="text-center relative">
               <div className="text-[7px] md:text-[10px] uppercase font-black tracking-[0.2em] text-emerald-500/40 mb-1 md:mb-4">Discard</div>
-              <div className="relative w-[60px] h-[84px] sm:w-[80px] sm:h-[112px] md:w-[120px] md:h-[168px]" onClick={() => discardPile.length > 0 && setShowDiscardSpread(true)} title="Tap to see last played cards">
+              <div className="relative w-[120px] h-[168px]" onClick={() => discardPile.length > 0 && setShowDiscardSpread(true)} title="Tap to see last played cards">
                 {discardPile.slice(-4).map((card, idx, arr) => {
                   const absIdx = discardPile.length - arr.length + idx;
                   const rotate = (absIdx * 17) % 30 - 15;
@@ -1025,7 +1025,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                       transition={{ type: 'spring', damping: 12 }}
                       className="absolute top-0 left-0 cursor-pointer"
                     >
-                      <Card card={card} isSmall={window.innerWidth < 640} />
+                      <Card card={card} isSmall={false} />
                     </motion.div>
                   );
                 })}
@@ -1047,11 +1047,10 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
           <div className="text-[7px] md:text-[10px] uppercase font-black tracking-[0.2em] text-emerald-500/40">Your Hand</div>
 
           <div className="flex flex-col items-center gap-2 w-full max-w-6xl relative">
-            <div className="w-full flex justify-center items-center flex-wrap gap-[-10px] sm:gap-2 md:gap-3 px-2 md:px-4 relative min-h-[100px] md:min-h-[160px]">
+            <div className="w-full flex justify-center items-center flex-wrap gap-2 md:gap-3 px-2 md:px-4 relative min-h-[160px]">
               <AnimatePresence>
                 {playerHand.map((card, index) => {
                   const isValid = turn === 0 && checkValidMove(card, playerHand.length);
-                  const isMobile = window.innerWidth < 640;
 
                   return (
                     <motion.div
@@ -1060,12 +1059,12 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
                       initial={false}
                       animate={{ opacity: 1, scale: 1 }}
                       whileHover={{ y: -15, scale: 1.05, zIndex: 100 }}
-                      className={`${isMobile ? '-mx-3' : ''} relative`}
+                      className="relative"
                       style={{ zIndex: index }}
                     >
                       <Card
                         card={card}
-                        isSmall={isMobile}
+                        isSmall={false}
                         onClick={() => isValid && !showSuitPicker && playCard(card, 0)}
                         className={`cursor-pointer transition-shadow ${isValid ? 'ring-2 ring-emerald-500 ring-offset-1 ring-offset-transparent' : ''} hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]`}
                       />
