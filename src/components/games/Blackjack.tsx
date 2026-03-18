@@ -236,7 +236,7 @@ export const Blackjack: React.FC<BlackjackProps> = ({ onBack, playerCount }) => 
           <div className="text-emerald-200/60 text-[10px] md:text-xs font-bold uppercase mb-2 md:mb-4 tracking-widest">Dealer Hand ({dealerScore})</div>
           <div className="flex gap-2 md:gap-4 justify-center flex-wrap">
             {dealerHand.map((card, i) => (
-              <Card key={card.id} card={card} isFaceUp={i === 0 || (gameState !== 'PLAYING' && gameState !== 'AI_TURN')} isSmall={window.innerWidth < 640} />
+              <Card key={card.id} card={card} isFaceUp={i === 0 || (gameState !== 'PLAYING' && gameState !== 'AI_TURN')} isSmall={false} />
             ))}
             {dealerHand.length === 0 && <div className="w-16 h-24 md:w-24 md:h-36 border-2 border-dashed border-white/10 rounded-lg" />}
           </div>
@@ -275,7 +275,7 @@ export const Blackjack: React.FC<BlackjackProps> = ({ onBack, playerCount }) => 
         <div className="text-center w-full">
           <div className="flex gap-2 md:gap-4 justify-center mb-2 md:mb-4 flex-wrap">
             {playerHand.map((card) => (
-              <Card key={card.id} card={card} isSmall={window.innerWidth < 640} />
+              <Card key={card.id} card={card} isSmall={false} />
             ))}
             {playerHand.length === 0 && <div className="w-16 h-24 md:w-24 md:h-36 border-2 border-dashed border-white/10 rounded-lg" />}
           </div>
@@ -327,27 +327,27 @@ export const Blackjack: React.FC<BlackjackProps> = ({ onBack, playerCount }) => 
         {isPaused && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
           >
-            <div className="bg-slate-900 p-12 rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-md w-full">
-              <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
-                <Pause className="w-10 h-10 text-emerald-500" />
+            <div className="bg-slate-900 p-6 md:p-12 rounded-3xl md:rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-md w-full max-h-screen overflow-y-auto">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 border border-emerald-500/30">
+                <Pause className="w-8 h-8 md:w-10 md:h-10 text-emerald-500" />
               </div>
-              <h3 className="text-4xl font-black mb-2 text-white tracking-tight">GAME PAUSED</h3>
-              <p className="text-emerald-400 text-sm mb-12 font-bold uppercase tracking-widest">Dealer is waiting</p>
+              <h3 className="text-2xl md:text-4xl font-black mb-2 text-white tracking-tight">GAME PAUSED</h3>
+              <p className="text-emerald-400 text-xs md:text-sm mb-8 md:mb-12 font-bold uppercase tracking-widest">Dealer is waiting</p>
               
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 md:gap-4">
                 <button 
                   onClick={() => setIsPaused(false)}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-4 rounded-2xl text-xl transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all flex items-center justify-center gap-2 md:gap-3"
                 >
-                  <PlayIcon className="w-5 h-5 fill-current" /> CONTINUE GAME
+                  <PlayIcon className="w-4 h-4 md:w-5 md:h-5 fill-current" /> CONTINUE GAME
                 </button>
                 <button 
                   onClick={onBack}
-                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl text-xl transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all flex items-center justify-center gap-2 md:gap-3"
                 >
-                  <Home className="w-5 h-5" /> MAIN MENU
+                  <Home className="w-4 h-4 md:w-5 md:h-5" /> MAIN MENU
                 </button>
               </div>
             </div>

@@ -1046,6 +1046,54 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
         <div className="w-full flex flex-col items-center gap-2 md:gap-8 pb-2 md:pb-12">
           <div className="text-[7px] md:text-[10px] uppercase font-black tracking-[0.2em] text-emerald-500/40">Your Hand</div>
 
+          <div className="flex flex-col items-center gap-2 md:gap-4 w-full">
+            <AnimatePresence mode="wait">
+              {showSuitPicker ? (
+                <motion.div
+                  key="suit-picker"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="flex flex-col items-center gap-2 w-full z-20"
+                >
+                  <div className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-0.5">Choose New Suit</div>
+                  <div className="flex gap-1.5 md:gap-3 bg-white/5 backdrop-blur-md p-2 md:p-3 rounded-2xl md:rounded-3xl border border-white/10">
+                    {[
+                      { suit: Suit.HEARTS, label: 'Hearts', icon: '❤️', color: 'text-red-500' },
+                      { suit: Suit.DIAMONDS, label: 'Diamonds', icon: '♦️', color: 'text-red-400' },
+                      { suit: Suit.CLUBS, label: 'Clubs', icon: '♣️', color: 'text-white' },
+                      { suit: Suit.SPADES, label: 'Spades', icon: '♠️', color: 'text-white' }
+                    ].map((opt) => (
+                      <motion.button
+                        key={opt.suit}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleSuitPick(opt.suit)}
+                        className="bg-white/5 border border-white/10 hover:border-emerald-500/50 p-2 md:p-4 rounded-xl md:rounded-2xl flex items-center gap-1 md:gap-2 transition-all"
+                      >
+                        <span className="text-lg md:text-2xl">{opt.icon}</span>
+                        <span className={`text-[7px] md:text-[10px] font-black uppercase tracking-widest hidden sm:inline ${opt.color}`}>{opt.label}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : turn === 0 && (
+                (isSkipPending || !playerHand.some(c => checkValidMove(c, playerHand.length)) || hasDrawn) && (
+                  <motion.button
+                    key="action-btn"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    onClick={hasDrawn || isSkipPending ? handleContinue : () => drawCards(0)}
+                    className={`${isSkipPending ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950'} font-black px-6 py-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl text-xs md:text-base transition-all shadow-xl hover:scale-105 active:scale-95 uppercase tracking-widest z-20`}
+                  >
+                    {isSkipPending ? 'ACCEPT SKIP' : (hasDrawn ? 'PASS TURN' : (penaltyCount > 0 ? `DRAW ${penaltyCount} CARDS` : 'DRAW CARD'))}
+                  </motion.button>
+                )
+              )}
+            </AnimatePresence>
+          </div>
+
           <div className="flex flex-col items-center gap-2 w-full max-w-6xl relative">
             <div className="w-full flex justify-center items-center flex-wrap gap-2 md:gap-3 px-2 md:px-4 relative min-h-[160px]">
               <AnimatePresence>
@@ -1077,53 +1125,7 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2 md:gap-4 w-full">
-            <AnimatePresence mode="wait">
-              {showSuitPicker ? (
-                <motion.div
-                  key="suit-picker"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="flex flex-col items-center gap-2 w-full"
-                >
-                  <div className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-0.5">Choose New Suit</div>
-                  <div className="flex gap-1.5 md:gap-3 bg-white/5 backdrop-blur-md p-2 md:p-3 rounded-2xl md:rounded-3xl border border-white/10">
-                    {[
-                      { suit: Suit.HEARTS, label: 'Hearts', icon: '❤️', color: 'text-red-500' },
-                      { suit: Suit.DIAMONDS, label: 'Diamonds', icon: '♦️', color: 'text-red-400' },
-                      { suit: Suit.CLUBS, label: 'Clubs', icon: '♣️', color: 'text-white' },
-                      { suit: Suit.SPADES, label: 'Spades', icon: '♠️', color: 'text-white' }
-                    ].map((opt) => (
-                      <motion.button
-                        key={opt.suit}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleSuitPick(opt.suit)}
-                        className="bg-white/5 border border-white/10 hover:border-emerald-500/50 p-2 md:p-4 rounded-xl md:rounded-2xl flex items-center gap-1 md:gap-2 transition-all"
-                      >
-                        <span className="text-lg md:text-2xl">{opt.icon}</span>
-                        <span className={`text-[7px] md:text-[10px] font-black uppercase tracking-widest hidden sm:inline ${opt.color}`}>{opt.label}</span>
-                      </motion.button>
-                    ))}
-                  </div>
-                </motion.div>
-              ) : turn === 0 && (
-                (isSkipPending || !playerHand.some(c => checkValidMove(c, playerHand.length)) || hasDrawn) && (
-                  <motion.button
-                    key="action-btn"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    onClick={hasDrawn || isSkipPending ? handleContinue : () => drawCards(0)}
-                    className={`${isSkipPending ? 'bg-red-500 hover:bg-red-400 text-white' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950'} font-black px-6 py-3 md:px-10 md:py-5 rounded-xl md:rounded-2xl text-xs md:text-base transition-all shadow-xl hover:scale-105 active:scale-95 uppercase tracking-widest`}
-                  >
-                    {isSkipPending ? 'ACCEPT SKIP' : (hasDrawn ? 'PASS TURN' : (penaltyCount > 0 ? `DRAW ${penaltyCount} CARDS` : 'DRAW CARD'))}
-                  </motion.button>
-                )
-              )}
-            </AnimatePresence>
-          </div>
+
         </div>
       </div>
 

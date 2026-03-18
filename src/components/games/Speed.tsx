@@ -211,7 +211,7 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
         <div className="flex flex-col items-center">
           <div className="text-[8px] md:text-xs font-bold text-emerald-200/40 mb-1 md:mb-2">AI Hand ({aiDeck.length} in deck)</div>
           <div className="flex gap-1 md:gap-2">
-            {aiHand.map((c) => <Card key={c.id} isFaceUp={false} isSmall />)}
+            {aiHand.map((c) => <Card key={c.id} isFaceUp={false} isSmall={false} />)}
           </div>
         </div>
 
@@ -219,17 +219,17 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
         <div className="flex items-center gap-4 md:gap-8 flex-wrap justify-center">
           <div className="text-center">
             <div className="text-[8px] md:text-[10px] uppercase font-bold text-emerald-200/40 mb-1 md:mb-2">Side</div>
-            <Card isFaceUp={false} onClick={handleStuck} className="opacity-50" isSmall={window.innerWidth < 640} />
+            <Card isFaceUp={false} onClick={handleStuck} className="opacity-50" isSmall={false} />
           </div>
           
           <div className="flex gap-2 md:gap-4">
-            <Card card={centerPiles[0]} isSmall={window.innerWidth < 640} />
-            <Card card={centerPiles[1]} isSmall={window.innerWidth < 640} />
+            <Card card={centerPiles[0]} isSmall={false} />
+            <Card card={centerPiles[1]} isSmall={false} />
           </div>
 
           <div className="text-center">
             <div className="text-[8px] md:text-[10px] uppercase font-bold text-emerald-200/40 mb-1 md:mb-2">Side</div>
-            <Card isFaceUp={false} onClick={handleStuck} className="opacity-50" isSmall={window.innerWidth < 640} />
+            <Card isFaceUp={false} onClick={handleStuck} className="opacity-50" isSmall={false} />
           </div>
         </div>
 
@@ -240,7 +240,7 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
               <div key={card.id} className="flex flex-col gap-1">
                 <Card 
                   card={card} 
-                  isSmall={window.innerWidth < 640}
+                  isSmall={false}
                   onClick={() => {
                     if (canPlayOn(card, centerPiles[0])) playCard(card, 0, true);
                     else if (canPlayOn(card, centerPiles[1])) playCard(card, 1, true);
@@ -259,24 +259,24 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
         {winner && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-6"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
           >
-            <div className="bg-slate-900 p-12 rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-lg w-full">
-              <h2 className="text-6xl font-black mb-2 text-white tracking-tight italic">
+            <div className="bg-slate-900 p-6 md:p-12 rounded-3xl md:rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-lg w-full max-h-screen overflow-y-auto">
+              <h2 className="text-4xl md:text-6xl font-black mb-2 text-white tracking-tight italic">
                 {winner === 'Player' ? 'YOU WIN!' : 'AI WINS!'}
               </h2>
-              <p className="text-emerald-400 text-sm mb-12 font-bold uppercase tracking-widest">Game Over</p>
+              <p className="text-emerald-400 text-xs md:text-sm mb-8 md:mb-12 font-bold uppercase tracking-widest">Game Over</p>
               
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 md:gap-4">
                 <button 
                   onClick={startNewGame}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-4 rounded-2xl text-xl transition-all shadow-lg hover:shadow-emerald-500/20"
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all shadow-lg hover:shadow-emerald-500/20"
                 >
                   PLAY AGAIN
                 </button>
                 <button 
                   onClick={onBack}
-                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl text-xl transition-all"
+                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all"
                 >
                   MAIN MENU
                 </button>
@@ -291,27 +291,27 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
         {isPaused && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
           >
-            <div className="bg-slate-900 p-12 rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-md w-full">
-              <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30">
-                <Pause className="w-10 h-10 text-emerald-500" />
+            <div className="bg-slate-900 p-6 md:p-12 rounded-3xl md:rounded-[3rem] border border-white/10 text-center shadow-2xl max-w-md w-full max-h-screen overflow-y-auto">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 border border-emerald-500/30">
+                <Pause className="w-8 h-8 md:w-10 md:h-10 text-emerald-500" />
               </div>
-              <h3 className="text-4xl font-black mb-2 text-white tracking-tight">GAME PAUSED</h3>
-              <p className="text-emerald-400 text-sm mb-12 font-bold uppercase tracking-widest">Take a breather</p>
+              <h3 className="text-2xl md:text-4xl font-black mb-2 text-white tracking-tight">GAME PAUSED</h3>
+              <p className="text-emerald-400 text-xs md:text-sm mb-8 md:mb-12 font-bold uppercase tracking-widest">Take a breather</p>
               
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 md:gap-4">
                 <button 
                   onClick={() => setIsPaused(false)}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-4 rounded-2xl text-xl transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-black py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all flex items-center justify-center gap-2 md:gap-3"
                 >
-                  <PlayIcon className="w-5 h-5 fill-current" /> CONTINUE GAME
+                  <PlayIcon className="w-4 h-4 md:w-5 md:h-5 fill-current" /> CONTINUE GAME
                 </button>
                 <button 
                   onClick={onBack}
-                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-4 rounded-2xl text-xl transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 md:py-4 rounded-xl md:rounded-2xl text-lg md:text-xl transition-all flex items-center justify-center gap-2 md:gap-3"
                 >
-                  <Home className="w-5 h-5" /> MAIN MENU
+                  <Home className="w-4 h-4 md:w-5 md:h-5" /> MAIN MENU
                 </button>
               </div>
             </div>
