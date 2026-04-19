@@ -4,7 +4,7 @@ import { createDeck, shuffleDeck, getCardValue } from '../../utils/deck';
 import { Card } from '../Card';
 import { RulesModal } from '../RulesModal';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, RotateCcw, Pause, Play as PlayIcon, Home, Trophy, Zap } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Pause, Play as PlayIcon, Home, Trophy, Zap, HelpCircle } from 'lucide-react';
 import { recordGameResult } from '../../utils/stats';
 
 interface SpeedProps {
@@ -158,6 +158,12 @@ export const Speed: React.FC<SpeedProps> = ({ onBack }) => {
             className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center text-emerald-200 hover:bg-white/10 hover:text-white transition-all"
           >
             <Pause className="w-4 h-4 md:w-5 h-5" />
+          </button>
+          <button 
+            onClick={() => setShowRules(true)} 
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center text-emerald-200 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <HelpCircle className="w-4 h-4 md:w-5 h-5" />
           </button>
         </div>
         <h2 className="text-lg md:text-2xl font-bold tracking-widest uppercase">Speed</h2>

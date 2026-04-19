@@ -7,6 +7,12 @@ const initialStats: PlayerStats = {
   CRAZY_EIGHTS: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
   HEARTS: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
   SPEED: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  TIC_TAC_TOE: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  LUDO: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  SNAKES_LADDERS: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  MONOPOLY: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  CHESS: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
+  CHECKERS: { wins: 0, losses: 0, gamesPlayed: 0, lastPlayed: '' },
   totalWins: 0,
   totalGames: 0,
 };
@@ -15,7 +21,9 @@ export const getStats = (): PlayerStats => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return initialStats;
   try {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored);
+    // Merge with initialStats to ensure all keys exist
+    return { ...initialStats, ...parsed };
   } catch (e) {
     return initialStats;
   }

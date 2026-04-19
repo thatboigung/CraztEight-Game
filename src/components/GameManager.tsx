@@ -4,11 +4,17 @@ import { Blackjack } from './games/Blackjack';
 import { CrazyEights } from './games/CrazyEights';
 import { Hearts } from './games/Hearts';
 import { Speed } from './games/Speed';
+import { TicTacToe } from './games/TicTacToe';
+import { Ludo } from './games/Ludo';
+import { SnakesAndLadders } from './games/SnakesAndLadders';
+import { Monopoly } from './games/Monopoly';
+import { Chess } from './games/Chess';
+import { Checkers } from './games/Checkers';
 import { Onboarding } from './Onboarding';
 import { Settings as SettingsView } from './Settings';
 import { PlayerCountModal } from './PlayerCountModal';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Play, Settings, Info, RotateCcw, BarChart3, Target, Clock, TrendingUp } from 'lucide-react';
+import { Trophy, Play, Settings, Info, RotateCcw, BarChart3, Target, Clock, TrendingUp, Grid3x3, Navigation, Map, Building2, Crown, Swords } from 'lucide-react';
 import { getStats } from '../utils/stats';
 
 export const GameManager: React.FC = () => {
@@ -18,12 +24,19 @@ export const GameManager: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [selectedGameForSetup, setSelectedGameForSetup] = useState<{ mode: GameMode; title: string } | null>(null);
   const [playerCount, setPlayerCount] = useState(2);
+  const [section, setSection] = useState<'SUITE' | 'BOARD'>('SUITE');
 
   const GAME_CONFIGS = {
     [GameMode.BLACKJACK]: { min: 1, max: 4, default: 1 },
     [GameMode.CRAZY_EIGHTS]: { min: 2, max: 6, default: 2 },
     [GameMode.HEARTS]: { min: 4, max: 4, default: 4 },
     [GameMode.SPEED]: { min: 2, max: 2, default: 2 },
+    [GameMode.TIC_TAC_TOE]: { min: 2, max: 2, default: 2 },
+    [GameMode.LUDO]: { min: 2, max: 4, default: 2 },
+    [GameMode.SNAKES_LADDERS]: { min: 2, max: 4, default: 2 },
+    [GameMode.MONOPOLY]: { min: 2, max: 6, default: 2 },
+    [GameMode.CHESS]: { min: 2, max: 2, default: 2 },
+    [GameMode.CHECKERS]: { min: 2, max: 2, default: 2 },
   };
 
   useEffect(() => {
@@ -50,13 +63,20 @@ export const GameManager: React.FC = () => {
       case GameMode.CRAZY_EIGHTS: return <CrazyEights onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
       case GameMode.HEARTS: return <Hearts onBack={() => setMode(GameMode.MENU)} />;
       case GameMode.SPEED: return <Speed onBack={() => setMode(GameMode.MENU)} />;
+      case GameMode.TIC_TAC_TOE: return <TicTacToe onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
+      case GameMode.LUDO: return <Ludo onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
+      case GameMode.SNAKES_LADDERS: return <SnakesAndLadders onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
+      case GameMode.MONOPOLY: return <Monopoly onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
+      case GameMode.CHESS: return <Chess onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
+      case GameMode.CHECKERS: return <Checkers onBack={() => setMode(GameMode.MENU)} playerCount={playerCount} />;
       default: return null;
     }
   };
 
   const handleGameClick = (mode: GameMode, title: string) => {
     const config = GAME_CONFIGS[mode as keyof typeof GAME_CONFIGS];
-    if (config && config.min !== config.max) {
+    // Skip external setup modal for games with advanced internal setup
+    if (config && config.min !== config.max && mode !== GameMode.LUDO && mode !== GameMode.SNAKES_LADDERS) {
       setSelectedGameForSetup({ mode, title });
     } else {
       setPlayerCount(config?.default || 2);
@@ -107,12 +127,27 @@ export const GameManager: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col"
+            className="flex flex-col w-full"
           >
-            <div className="text-[8px] lg:text-[10px] font-black tracking-[0.4em] text-emerald-500 uppercase mb-0.5 lg:mb-1">Suite</div>
+            <div className="text-[8px] lg:text-[10px] font-black tracking-[0.4em] text-emerald-500 uppercase mb-0.5 lg:mb-1">{section === 'SUITE' ? 'Suite' : 'Board'}</div>
             <h1 className="text-xl lg:text-5xl font-black tracking-tighter leading-none italic">
-              CARD<span className="text-emerald-500">.</span>
+              {section === 'SUITE' ? 'CARD' : 'GAME'}<span className="text-emerald-500">.</span>
             </h1>
+            
+            <div className="flex items-center gap-2 mt-6 lg:mt-10 w-full bg-white/5 rounded-xl p-1.5 border border-white/5">
+              <button
+                onClick={() => setSection('SUITE')}
+                className={`flex-1 py-2 text-[10px] lg:text-xs font-black uppercase tracking-widest rounded-lg transition-all ${section === 'SUITE' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+              >
+                The Suite
+              </button>
+              <button
+                onClick={() => setSection('BOARD')}
+                className={`flex-1 py-2 text-[10px] lg:text-xs font-black uppercase tracking-widest rounded-lg transition-all ${section === 'BOARD' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+              >
+                The Board
+              </button>
+            </div>
           </motion.div>
 
           <div className="hidden lg:block w-full space-y-8 mt-12">
@@ -184,7 +219,7 @@ export const GameManager: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
             >
               <h2 className="text-3xl md:text-5xl lg:text-7xl font-black tracking-tighter uppercase italic mb-2 lg:mb-4">
-                The <span className="text-emerald-500">Suite</span>
+                The <span className="text-emerald-500">{section === 'SUITE' ? 'Suite' : 'Board'}</span>
               </h2>
               <div className="flex items-center gap-3 lg:gap-4">
                 <div className="h-px w-8 lg:w-12 bg-emerald-500" />
@@ -196,42 +231,103 @@ export const GameManager: React.FC = () => {
           </header>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8">
-            <GameCard 
-              title="Blackjack" 
-              description="Beat the dealer to 21." 
-              onClick={() => handleGameClick(GameMode.BLACKJACK, "Blackjack")}
-              number="01"
-              icon={<Trophy className="w-6 h-6" />}
-              color="from-blue-500/20 to-indigo-500/20"
-              stats={stats.BLACKJACK}
-            />
-            <GameCard 
-              title="Crazy Eights" 
-              description="Wild cards and strategy." 
-              onClick={() => handleGameClick(GameMode.CRAZY_EIGHTS, "Crazy Eights")}
-              number="02"
-              icon={<RotateCcw className="w-6 h-6" />}
-              color="from-emerald-500/20 to-teal-500/20"
-              stats={stats.CRAZY_EIGHTS}
-            />
-            <GameCard 
-              title="Hearts" 
-              description="Avoid the hearts." 
-              onClick={() => handleGameClick(GameMode.HEARTS, "Hearts")}
-              number="03"
-              icon={<Info className="w-6 h-6" />}
-              color="from-rose-500/20 to-pink-500/20"
-              stats={stats.HEARTS}
-            />
-            <GameCard 
-              title="Speed" 
-              description="Fast-paced matching." 
-              onClick={() => handleGameClick(GameMode.SPEED, "Speed")}
-              number="04"
-              icon={<Play className="w-6 h-6" />}
-              color="from-amber-500/20 to-orange-500/20"
-              stats={stats.SPEED}
-            />
+            {section === 'SUITE' ? (
+              <>
+                <GameCard 
+                  title="Blackjack" 
+                  description="Beat the dealer to 21." 
+                  onClick={() => handleGameClick(GameMode.BLACKJACK, "Blackjack")}
+                  number="01"
+                  icon={<Trophy className="w-6 h-6" />}
+                  color="from-blue-500/20 to-indigo-500/20"
+                  stats={stats.BLACKJACK}
+                />
+                <GameCard 
+                  title="Crazy Eights" 
+                  description="Wild cards and strategy." 
+                  onClick={() => handleGameClick(GameMode.CRAZY_EIGHTS, "Crazy Eights")}
+                  number="02"
+                  icon={<RotateCcw className="w-6 h-6" />}
+                  color="from-emerald-500/20 to-teal-500/20"
+                  stats={stats.CRAZY_EIGHTS}
+                />
+                <GameCard 
+                  title="Hearts" 
+                  description="Avoid the hearts." 
+                  onClick={() => handleGameClick(GameMode.HEARTS, "Hearts")}
+                  number="03"
+                  icon={<Info className="w-6 h-6" />}
+                  color="from-rose-500/20 to-pink-500/20"
+                  stats={stats.HEARTS}
+                />
+                <GameCard 
+                  title="Speed" 
+                  description="Fast-paced matching." 
+                  onClick={() => handleGameClick(GameMode.SPEED, "Speed")}
+                  number="04"
+                  icon={<Play className="w-6 h-6" />}
+                  color="from-amber-500/20 to-orange-500/20"
+                  stats={stats.SPEED}
+                />
+              </>
+            ) : (
+              <>
+                <GameCard 
+                  title="Tic-Tac-Toe" 
+                  description="Classic 3x3 strategy." 
+                  onClick={() => handleGameClick(GameMode.TIC_TAC_TOE, "Tic-Tac-Toe")}
+                  number="01"
+                  icon={<Grid3x3 className="w-6 h-6" />}
+                  color="from-blue-500/20 to-purple-500/20"
+                  stats={stats.TIC_TAC_TOE}
+                />
+                <GameCard 
+                  title="Ludo" 
+                  description="Race your tokens home." 
+                  onClick={() => handleGameClick(GameMode.LUDO, "Ludo")}
+                  number="02"
+                  icon={<Map className="w-6 h-6" />}
+                  color="from-yellow-500/20 to-red-500/20"
+                  stats={stats.LUDO}
+                />
+                <GameCard 
+                  title="Snakes & Ladders" 
+                  description="Climb up, slide down." 
+                  onClick={() => handleGameClick(GameMode.SNAKES_LADDERS, "Snakes & Ladders")}
+                  number="03"
+                  icon={<Navigation className="w-6 h-6" />}
+                  color="from-green-500/20 to-emerald-500/20"
+                  stats={stats.SNAKES_LADDERS}
+                />
+                <GameCard 
+                  title="Monopoly" 
+                  description="Own it all." 
+                  onClick={() => handleGameClick(GameMode.MONOPOLY, "Monopoly")}
+                  number="04"
+                  icon={<Building2 className="w-6 h-6" />}
+                  color="from-red-600/20 to-orange-500/20"
+                  stats={stats.MONOPOLY}
+                />
+                <GameCard 
+                  title="Chess" 
+                  description="Master the 64 squares." 
+                  onClick={() => handleGameClick(GameMode.CHESS, "Chess")}
+                  number="05"
+                  icon={<Crown className="w-6 h-6" />}
+                  color="from-indigo-500/20 to-purple-500/20"
+                  stats={stats.CHESS}
+                />
+                <GameCard 
+                  title="Checkers" 
+                  description="Jump, capture, king." 
+                  onClick={() => handleGameClick(GameMode.CHECKERS, "Checkers")}
+                  number="06"
+                  icon={<Target className="w-6 h-6" />}
+                  color="from-amber-500/20 to-red-500/20"
+                  stats={stats.CHECKERS}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

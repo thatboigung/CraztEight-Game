@@ -34,6 +34,12 @@ export enum GameMode {
   BLACKJACK = 'BLACKJACK',
   HEARTS = 'HEARTS',
   SPEED = 'SPEED',
+  TIC_TAC_TOE = 'TIC_TAC_TOE',
+  LUDO = 'LUDO',
+  SNAKES_LADDERS = 'SNAKES_LADDERS',
+  MONOPOLY = 'MONOPOLY',
+  CHESS = 'CHESS',
+  CHECKERS = 'CHECKERS',
   MENU = 'MENU',
 }
 
@@ -49,6 +55,12 @@ export interface PlayerStats {
   CRAZY_EIGHTS: GameStats;
   HEARTS: GameStats;
   SPEED: GameStats;
+  TIC_TAC_TOE: GameStats;
+  LUDO: GameStats;
+  SNAKES_LADDERS: GameStats;
+  MONOPOLY: GameStats;
+  CHESS: GameStats;
+  CHECKERS: GameStats;
   totalWins: number;
   totalGames: number;
 }

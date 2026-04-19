@@ -4,7 +4,7 @@ import { createDeck, shuffleDeck } from '../../utils/deck';
 import { Card } from '../Card';
 import { RulesModal } from '../RulesModal';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, RotateCcw, AlertCircle, Pause, Play as PlayIcon, Home, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, RotateCcw, AlertCircle, Pause, Play as PlayIcon, Home, Trophy, Users, HelpCircle } from 'lucide-react';
 import { recordGameResult } from '../../utils/stats';
 
 interface CrazyEightsProps {
@@ -800,11 +800,17 @@ export const CrazyEights: React.FC<CrazyEightsProps> = ({ onBack, playerCount })
           <button onClick={onBack} className="flex items-center gap-1 md:gap-2 text-emerald-200 hover:text-white transition-colors text-sm md:text-base">
             <ArrowLeft className="w-4 h-4 md:w-5 h-5" /> <span className="hidden sm:inline">Back</span>
           </button>
-          <button
-            onClick={() => setIsPaused(true)}
+          <button 
+            onClick={() => setIsPaused(true)} 
             className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center text-emerald-200 hover:bg-white/10 hover:text-white transition-all"
           >
             <Pause className="w-4 h-4 md:w-5 h-5" />
+          </button>
+          <button 
+            onClick={() => setShowRules(true)} 
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center text-emerald-200 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <HelpCircle className="w-4 h-4 md:w-5 h-5" />
           </button>
         </div>
         <div className="text-center">
